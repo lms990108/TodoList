@@ -3,6 +3,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended : false }));
 app.set('view engine', 'ejs');
+app.use('/public', express.static('public'));
+
 
 
 const MongoClient = require('mongodb').MongoClient;
@@ -22,11 +24,11 @@ MongoClient.connect('mongodb+srv://lms990108:minseop12@cluster0.tryw5ni.mongodb.
 })
 
 app.get('/', function(req,res){
-     res.sendFile(__dirname + '/index.html')
+     res.render('index.ejs')
 });
 
 app.get('/write', function(req,res){
-    res.sendFile(__dirname + '/write.html')
+    res.render('write.ejs')
 });
 
 app.post('/add', function(req,res){
