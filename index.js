@@ -65,5 +65,18 @@ app.delete('/delete', function(req, res){
     db.collection('post').deleteOne(req.body, function(error, result){
         console.log('삭제 완료')
         res.status(200).send({message : '성공'});
+
     })
 });
+
+app.get('/detail/:id', function(req, res){
+    db.collection('post').findOne({_id : parseInt(req.params.id)}, function(error,result){
+        console.log(result);
+        if(result == null){
+            res.status(404).send('<h1>페이지 없음</h1>')
+        }else{
+            res.render('detail.ejs', {data : result});
+        }
+    })
+    
+})
