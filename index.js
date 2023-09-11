@@ -1,5 +1,8 @@
 const express = require('express');
 const app = express();
+const dotenv = require('dotenv');
+dotenv.config();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended : false }));
 app.set('view engine', 'ejs');
@@ -8,9 +11,10 @@ app.use('/public', express.static('public'));
 
 
 const MongoClient = require('mongodb').MongoClient;
+const mongoURI = process.env.MONGO_DB_PATH;
 
 var db;
-MongoClient.connect('mongodb+srv://lms990108:minseop12@cluster0.tryw5ni.mongodb.net/?retryWrites=true&w=majority', function(err, client){
+MongoClient.connect(mongoURI, function(err, client){
 
     if(err) return console.log(err);
 
