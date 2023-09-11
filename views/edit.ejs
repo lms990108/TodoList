@@ -17,12 +17,12 @@
             <form action="/edit?_method=PUT" method="POST">
                 <div class="form-group">
                     <label>할 일</label>
-                    <input type="text" value="<%= edit._id%>" name="id" style="display : none;">
-                    <input type="text" class="form-control" name="title" value="<%= edit.제목 %>">
+                    <input type="text" value="<%= post._id %>" name="id" style="display : none;">
+                    <input type="text" class="form-control" name="title" value="<%= post.제목 %>">
                 </div>
                 <div class="form-group">
                     <label>Due date</label>
-                    <input type="text" class="form-control" name="date" value="<%= edit.날짜 %>">
+                    <input type="text" class="form-control" name="date" value="<%= post.날짜 %>">
                 </div>
                 <button type="submit" class="btn btn-danger my-2">Submit</button>
             </form>

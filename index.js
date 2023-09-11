@@ -1,15 +1,16 @@
 const express = require('express');
 const app = express();
 const dotenv = require('dotenv');
-dotenv.config();
+const methodOverride = require('method-override')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended : false }));
 app.set('view engine', 'ejs');
 app.use('/public', express.static('public'));
+app.use(methodOverride('_method'))
 
 
-
+dotenv.config();
 const MongoClient = require('mongodb').MongoClient;
 const mongoURI = process.env.MONGO_DB_PATH;
 
@@ -36,7 +37,7 @@ app.get('/write', function(req,res){
 });
 
 app.post('/add', function(req,res){
-    res.send('전송완료')
+    // res.send('전송완료')
 
     let a = req.body.title;
     let b = req.body.date;
@@ -46,7 +47,7 @@ app.post('/add', function(req,res){
         var totalPost = result.totalPost;
         db.collection('post').insertOne({_id : totalPost + 1, 제목:a, 날짜:b}, function(error, result){
             console.log('저장완료');
-
+            res.redirect('/list')    
             db.collection('counter').updateOne({name:'게시물갯수'}, { $inc : {totalPost:1}}, function(error, result){
                 if(error){return console.log(error)};
             });
@@ -73,6 +74,7 @@ app.delete('/delete', function(req, res){
         res.status(200).send({message : '성공'});
 
     })
+
 });
 
 app.get('/detail/:id', function(req, res){
@@ -85,4 +87,24 @@ app.get('/detail/:id', function(req, res){
         }
     })
     
+})
+
+app.get('/edit/:id', (req, res) => {
+
+    db.collection('post').findOne({_id: parseInt(req.params.id)}, (err, result) => {
+        console.log(req.params.id)
+        res.render('edit.ejs', {post : result})
+    })
+    
+})
+
+app.put('/edit', (req, res) => {
+    const {id, title, date} = req.body;
+    console.log(req.body)
+    db.collection('post').updateOne({_id : parseInt(id)}, 
+    { $set : {제목 : title, 날짜: date}}, 
+    (err,result) => {
+        console.log('수정 완료')
+        res.redirect('/list')
+    })
 })
