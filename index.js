@@ -2,17 +2,24 @@ const express = require('express');
 const app = express();
 const dotenv = require('dotenv');
 const methodOverride = require('method-override')
+const passport = require('passport')
+const LocalStrategy = require('passport-local').Strategy
+const session = require('express-session')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended : false }));
 app.set('view engine', 'ejs');
 app.use('/public', express.static('public'));
 app.use(methodOverride('_method'))
-
+app.use(session({secret : "password", resave : true, saveUninitialized : false}))
+app.use(passport.initialize())
+app.use(passport.session())
 
 dotenv.config();
+
 const MongoClient = require('mongodb').MongoClient;
 const mongoURI = process.env.MONGO_DB_PATH;
+// const passwordSession = process.env.SESSION_PASSWORD;
 
 var db;
 MongoClient.connect(mongoURI, function(err, client){
@@ -107,4 +114,39 @@ app.put('/edit', (req, res) => {
         console.log('수정 완료')
         res.redirect('/list')
     })
+})
+
+app.get('/login', (req, res) => {
+    res.render('login.ejs')
+})
+
+app.post('/login', passport.authenticate('local', {
+    failureRedirect: '/fail'
+}),(req, res) => {
+    res.redirect('/')
+})
+
+passport.use(new LocalStrategy({
+    usernameField: 'id',
+    passwordField: 'pw',
+    session: true,
+    passReqToCallback: false,
+}, (inputId, inputPw, done) => {
+    //console.log(inputId, inputPw)
+    db.collection('login').findOne({id: inputId}, (error, result) => {
+        if(error) return done(error)
+        if(!result) return done(null, false, {message : '존재하지 않는 ID'})
+        if(inputPw == result.pw){
+            return done(null, result)
+        }else{
+            return done(null, false, {message: '비번 틀림'})
+        }
+    })
+}))
+
+passport.serializeUser((user, done) => {
+    done(null, user.id)
+})
+passport.deserializeUser((id, done) => {
+    done(null, {})
 })
