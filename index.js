@@ -126,6 +126,26 @@ app.post('/login', passport.authenticate('local', {
     res.redirect('/')
 })
 
+app.get('/mypage', isLogin, (req, res) => {
+    res.render('mypage.ejs', {user: req.user})
+})
+
+function isLogin(req, res, cb){
+    if(req.user){
+        cb()
+    }else{
+        res.send('로그인 안함')
+    }
+}
+
+
+
+
+
+
+
+
+
 passport.use(new LocalStrategy({
     usernameField: 'id',
     passwordField: 'pw',
@@ -147,6 +167,8 @@ passport.use(new LocalStrategy({
 passport.serializeUser((user, done) => {
     done(null, user.id)
 })
-passport.deserializeUser((id, done) => {
-    done(null, {})
+passport.deserializeUser((userId, done) => {
+    db.collection('login').findOne({id : userId}, (error, result) => {
+        done(null, result)
+    })
 })
