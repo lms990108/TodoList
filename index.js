@@ -28,7 +28,7 @@ MongoClient.connect(mongoURI, function(err, client){
 
     db = client.db('todoapp');
 
-    app.listen(8080, function(){
+    app.listen(8081, function(){
         console.log('listening on 8080')
     });
 
@@ -130,9 +130,9 @@ app.get('/mypage', isLogin, (req, res) => {
     res.render('mypage.ejs', {user: req.user})
 })
 
-function isLogin(req, res, cb){
+function isLogin(req, res, next){
     if(req.user){
-        cb()
+        next()
     }else{
         res.send('로그인 안함')
     }
